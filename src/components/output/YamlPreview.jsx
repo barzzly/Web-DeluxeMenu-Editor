@@ -44,11 +44,15 @@ export default function YamlPreview() {
     });
   }, [yamlText]);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(yamlText);
-    setCopied(true);
-    showToast('YAML copied to clipboard!', 'success');
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(yamlText);
+      setCopied(true);
+      showToast('YAML copied to clipboard!', 'success');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      showToast(`Copy failed: ${error.message}`, 'error');
+    }
   };
 
   const handleDownload = () => {

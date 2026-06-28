@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/images/barzzly-logo-light.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (() => {
+        const theme = localStorage.getItem('barzzly-theme') || 'dark';
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.toggle('light', theme !== 'dark');
+      })();
+    </script>
     <title>BarzzLy DeluxeMenu Editor</title>
     <meta name="description" content="BarzzLy web editor for building, importing, previewing, and exporting Minecraft DeluxeMenus YAML configs." />
     <meta name="application-name" content="BarzzLy DeluxeMenu Editor" />

@@ -63,6 +63,7 @@ export default function TagInput({ tags = [], onChange, placeholder = 'Add item.
           <button 
             type="button"
             onClick={() => removeTag(idx)} 
+            aria-label={`Remove ${tag}`}
             className="text-zinc-400 hover:text-zinc-100 transition-colors"
           >
             <X size={12} />

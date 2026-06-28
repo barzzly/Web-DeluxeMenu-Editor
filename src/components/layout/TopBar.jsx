@@ -116,7 +116,7 @@ export default function TopBar() {
       {/* Left: Brand & Editable File Name */}
       <div className="flex items-center gap-3 sm:gap-6 min-w-0">
         <div className="flex items-center gap-2">
-          <img src={logoSrc} alt="BarzzLy" className={`h-8 w-8 object-contain shrink-0 ${theme === 'dark' ? 'invert' : ''}`} />
+          <img src={logoSrc} alt="BarzzLy logo" className={`h-8 w-8 object-contain shrink-0 opacity-95 ${theme === 'dark' ? 'invert' : ''}`} />
           <span className="text-sm font-bold tracking-wide uppercase text-zinc-100 sm:inline">BarzzLy</span>
         </div>
 
@@ -161,6 +161,7 @@ export default function TopBar() {
             disabled={past.length === 0}
             className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
             title="Undo (Ctrl+Z)"
+            aria-label="Undo"
           >
             <Undo2 size={14} />
           </button>
@@ -169,6 +170,7 @@ export default function TopBar() {
             disabled={future.length === 0}
             className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
             title="Redo (Ctrl+Shift+Z)"
+            aria-label="Redo"
           >
             <Redo2 size={14} />
           </button>
@@ -178,6 +180,7 @@ export default function TopBar() {
           onClick={toggleTheme}
           className="flex h-8 w-8 items-center justify-center rounded border border-zinc-800 bg-zinc-900/90 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors shrink-0"
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
         </button>
