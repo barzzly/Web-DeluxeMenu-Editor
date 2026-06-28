@@ -1,7 +1,7 @@
 import React from 'react';
 import TagInput from '../../ui/TagInput';
 import Toggle from '../../ui/Toggle';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 export default function TabNBT({ item, updateItem }) {
   // Safe helper to extract model data component values
@@ -27,15 +27,15 @@ export default function TabNBT({ item, updateItem }) {
   };
 
   return (
-    <div className="flex flex-col gap-4 text-xs">
+    <div className="flex min-w-0 max-w-full flex-col gap-4 text-xs">
       {/* 1.21.4+ Modern Model Data Component section */}
-      <div className="flex flex-col gap-3">
-        <span className="font-semibold text-zinc-400 uppercase tracking-wide">Modern Model Data Component (1.21.4+)</span>
-        <p className="text-[10px] text-zinc-500 leading-relaxed">
+      <div className="flex min-w-0 flex-col gap-3">
+        <span className="break-words font-semibold text-zinc-400 uppercase tracking-wide">Modern Model Data Component (1.21.4+)</span>
+        <p className="break-words text-[10px] text-zinc-500 leading-relaxed">
           Minecraft 1.21.4 introduced <code>model_data</code> components containing vectors of strings, floats, booleans, and colors.
         </p>
 
-        <div className="bg-zinc-900/20 p-3 rounded border border-zinc-800/40">
+        <div className="min-w-0 bg-zinc-900/20 p-3 rounded border border-zinc-800/40">
           <Toggle
             checked={item.model_data_component !== null && item.model_data_component !== undefined}
             onChange={handleToggleComponent}
@@ -45,7 +45,7 @@ export default function TabNBT({ item, updateItem }) {
         </div>
 
         {item.model_data_component && (
-          <div className="flex flex-col gap-3.5 bg-zinc-900/10 p-3 rounded border border-zinc-850 animate-fadeIn">
+          <div className="flex min-w-0 flex-col gap-3.5 bg-zinc-900/10 p-3 rounded border border-zinc-850 animate-fadeIn">
             {/* Strings */}
             <div className="flex flex-col gap-1">
               <span className="text-[10px] font-semibold text-zinc-400">Strings Vector</span>
@@ -90,9 +90,9 @@ export default function TabNBT({ item, updateItem }) {
       </div>
 
       {/* Legacy Model Data Section */}
-      <div className="border-t border-zinc-800/60 pt-4 flex flex-col gap-2.5">
-        <div className="flex justify-between items-center">
-          <span className="font-semibold text-zinc-400 uppercase tracking-wide">Legacy Custom Model Data</span>
+      <div className="min-w-0 border-t border-zinc-800/60 pt-4 flex flex-col gap-2.5">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+          <span className="break-words font-semibold text-zinc-400 uppercase tracking-wide">Legacy Custom Model Data</span>
           {item.model_data !== null && item.model_data !== '' && (
             <span className="text-[9px] px-1 bg-amber-950/20 text-amber-400 border border-amber-900/30 rounded">Deprecated</span>
           )}
@@ -120,13 +120,13 @@ export default function TabNBT({ item, updateItem }) {
       </div>
 
       {/* Legacy NBT Tag Fields Section */}
-      <div className="border-t border-zinc-800/60 pt-4 flex flex-col gap-3">
-        <div className="flex justify-between items-center">
-          <span className="font-semibold text-zinc-400 uppercase tracking-wide">Legacy NBT Attributes (&lt; 1.20.5)</span>
+      <div className="min-w-0 border-t border-zinc-800/60 pt-4 flex flex-col gap-3">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+          <span className="break-words font-semibold text-zinc-400 uppercase tracking-wide">Legacy NBT Attributes (&lt; 1.20.5)</span>
           <span className="text-[9px] px-1 bg-amber-950/20 text-amber-400 border border-amber-900/30 rounded">Deprecated</span>
         </div>
         
-        <p className="text-[10px] text-zinc-500 leading-relaxed">
+        <p className="break-words text-[10px] text-zinc-500 leading-relaxed">
           NBT structures are deprecated in modern Minecraft versions in favor of components. Use format <code>key:value</code>.
         </p>
 

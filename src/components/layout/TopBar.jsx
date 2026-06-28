@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMenuStore } from '../../store/useMenuStore';
-import { Undo2, Redo2, Upload, Download, RotateCcw, Edit2 } from 'lucide-react';
+import { Undo2, Redo2, Upload, Download, RotateCcw, Edit2, Moon, Sun } from 'lucide-react';
 import Modal from '../ui/Modal';
+import ConfirmDialog from '../ui/ConfirmDialog';
 import { generateYaml } from '../../utils/yamlGenerator';
 
 export default function TopBar() {
@@ -18,11 +19,24 @@ export default function TopBar() {
   } = useMenuStore();
 
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [importText, setImportText] = useState('');
   const [importFileName, setImportFileName] = useState('');
   const [isEditingName, setIsEditingName] = useState(false);
   const fileInputRef = useRef(null);
   const [tempName, setTempName] = useState(menuName);
+  const [theme, setTheme] = useState(() => localStorage.getItem('barzzly-theme') || 'dark');
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const isDark = theme === 'dark';
+    root.classList.toggle('dark', isDark);
+    root.classList.toggle('light', !isDark);
+    localStorage.setItem('barzzly-theme', theme);
+  }, [theme]);
+
+  const logoSrc = theme === 'dark' ? '/images/barzzly-mark-white.png' : '/images/barzzly-mark-black.png';
+  const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark');
 
   const handleSaveName = () => {
     const cleanName = tempName.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -90,28 +104,27 @@ export default function TopBar() {
     showToast('YAML config downloaded!', 'success');
   };
 
-  const handleResetConfirm = () => {
-    if (window.confirm('Are you sure you want to reset this menu? All items and settings will be cleared.')) {
-      resetMenu();
-    }
+  const handleResetConfirm = () => setIsResetConfirmOpen(true);
+
+  const handleResetMenu = () => {
+    resetMenu();
+    setIsResetConfirmOpen(false);
   };
 
   return (
-    <div className="min-h-14 border-b border-zinc-800 bg-zinc-900 px-3 sm:px-6 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 select-none">
+    <div className="min-h-14 border-b border-zinc-800/80 bg-zinc-900/85 px-3 sm:px-6 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 select-none backdrop-blur-xl sticky top-0 z-40">
       {/* Left: Brand & Editable File Name */}
       <div className="flex items-center gap-3 sm:gap-6 min-w-0">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-indigo-600 flex items-center justify-center font-bold text-white tracking-wider text-sm shadow shadow-indigo-500/20">
-            Bz
-          </div>
-          <span className="text-sm font-bold tracking-wide uppercase text-zinc-200 hidden sm:inline">Barzz.ly</span>
+          <img src={logoSrc} alt="BarzzLy" className="h-7 w-7 object-contain shrink-0" />
+          <span className="text-sm font-bold tracking-wide uppercase text-zinc-100 sm:inline">BarzzLy</span>
         </div>
 
         <div className="h-4 w-px bg-zinc-800 hidden sm:block" />
 
         {/* Editable Menu Name */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-zinc-500 font-mono hidden sm:inline">dmenu.barzzly.com/</span>
+          <span className="text-xs text-zinc-500 font-mono hidden md:inline">dmenu.barzzly.com/</span>
           {isEditingName ? (
             <input
               type="text"
@@ -120,7 +133,7 @@ export default function TopBar() {
               onBlur={handleSaveName}
               onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
               autoFocus
-              className="px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-xs font-mono text-zinc-100 rounded focus:outline-none focus:border-indigo-500"
+              className="min-w-0 w-36 sm:w-auto px-2 py-1 bg-zinc-800 border border-zinc-700 text-xs font-mono text-zinc-100 rounded focus:outline-none focus:border-indigo-500"
             />
           ) : (
             <div 
@@ -130,7 +143,7 @@ export default function TopBar() {
                 setIsEditingName(true);
               }}
             >
-              <span className="text-xs font-mono font-medium text-zinc-200 hover:text-zinc-150 transition-colors">
+              <span className="max-w-[44vw] sm:max-w-none truncate text-xs font-mono font-medium text-zinc-200 hover:text-zinc-100 transition-colors">
                 {menuName}.yml
               </span>
               <Edit2 size={10} className="text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -140,9 +153,9 @@ export default function TopBar() {
       </div>
 
       {/* Right: Actions and History */}
-      <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+      <div className="mobile-action-strip flex items-center gap-2 sm:gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
         {/* History controls */}
-        <div className="flex items-center border border-zinc-800 rounded bg-zinc-950 p-0.5">
+        <div className="flex items-center border border-zinc-800 rounded bg-zinc-950/80 p-0.5 shrink-0">
           <button
             onClick={undo}
             disabled={past.length === 0}
@@ -161,12 +174,20 @@ export default function TopBar() {
           </button>
         </div>
 
-        <div className="h-4 w-px bg-zinc-800" />
+        <button
+          onClick={toggleTheme}
+          className="flex h-8 w-8 items-center justify-center rounded border border-zinc-800 bg-zinc-900/90 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors shrink-0"
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+        </button>
+
+        <div className="h-4 w-px bg-zinc-800 shrink-0" />
 
         {/* Operational buttons */}
         <button
           onClick={() => setIsImportModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-zinc-300 hover:text-zinc-100 border border-zinc-800 bg-zinc-900 rounded hover:bg-zinc-850 transition-colors"
+          className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-zinc-300 hover:text-zinc-100 border border-zinc-800 bg-zinc-900/90 rounded hover:bg-zinc-800 transition-colors shrink-0"
         >
           <Upload size={13} />
           <span>Import</span>
@@ -174,7 +195,7 @@ export default function TopBar() {
 
         <button
           onClick={handleExport}
-          className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded shadow-sm shadow-indigo-600/10 transition-colors"
+          className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded shadow-sm shadow-indigo-600/20 transition-colors shrink-0"
         >
           <Download size={13} />
           <span>Download</span>
@@ -182,12 +203,22 @@ export default function TopBar() {
 
         <button
           onClick={handleResetConfirm}
-          className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850 rounded transition-colors"
+          className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-colors shrink-0"
         >
           <RotateCcw size={13} />
           <span>Reset</span>
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={isResetConfirmOpen}
+        onClose={() => setIsResetConfirmOpen(false)}
+        onConfirm={handleResetMenu}
+        title="Reset menu?"
+        message="This clears all items and settings in the current menu."
+        confirmLabel="Reset Menu"
+        tone="danger"
+      />
 
       {/* Import YAML Modal */}
       <Modal

@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight, Settings, Grid3X3, CircleDot } from 'lucide-
 import MenuSettings from '../menu/MenuSettings';
 import { MinecraftText } from '../../utils/colorPreview';
 
-export default function Sidebar() {
+export default function Sidebar({ style }) {
   const { items, selectedItemId, selectItem } = useMenuStore();
   const [menuConfigOpen, setMenuConfigOpen] = useState(true);
   const [itemListOpen, setItemListOpen] = useState(true);
@@ -13,9 +13,12 @@ export default function Sidebar() {
   const placedItems = Object.values(items).sort((a, b) => a.slot - b.slot);
 
   return (
-    <div className="w-full lg:w-[280px] border-r border-zinc-800 bg-zinc-900 flex flex-col lg:h-full max-h-[45vh] lg:max-h-none overflow-hidden select-none">
+    <div 
+      style={style}
+      className="w-full lg:w-auto border-r-0 lg:border-r border-zinc-800/80 bg-zinc-900/80 flex flex-col lg:h-full max-h-[42vh] sm:max-h-[46vh] lg:max-h-none overflow-hidden select-none backdrop-blur-xl animate-fadeIn"
+    >
       {/* Header Info */}
-      <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900/40 flex items-center gap-2">
+      <div className="px-4 py-3 border-b border-zinc-800/80 bg-zinc-900/50 flex items-center gap-2">
         <Settings size={14} className="text-zinc-400" />
         <span className="text-xs font-bold tracking-wider uppercase text-zinc-400">Settings & Hierarchy</span>
       </div>
@@ -56,7 +59,7 @@ export default function Sidebar() {
           </button>
           
           {itemListOpen && (
-            <div className="p-2 flex flex-col gap-1 max-h-[180px] lg:max-h-[300px] overflow-y-auto">
+            <div className="p-2 flex flex-col gap-1 max-h-[150px] sm:max-h-[180px] lg:max-h-[300px] overflow-y-auto">
               {placedItems.length === 0 ? (
                 <div className="text-[11px] text-zinc-500 text-center py-6">
                   No items placed yet. Click grid to add.

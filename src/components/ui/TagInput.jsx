@@ -53,13 +53,13 @@ export default function TagInput({ tags = [], onChange, placeholder = 'Add item.
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 p-1.5 min-h-[38px] w-full rounded border border-zinc-800 bg-zinc-800/50 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 transition-all">
+    <div className="flex min-w-0 max-w-full flex-wrap items-center gap-1.5 p-1.5 min-h-[38px] w-full rounded border border-zinc-800 bg-zinc-800/50 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 transition-all">
       {tags.map((tag, idx) => (
         <span 
           key={idx} 
-          className="flex items-center gap-1 px-2 py-0.5 text-xs bg-zinc-700 hover:bg-zinc-650 text-zinc-100 rounded"
+          className="flex min-w-0 max-w-full items-center gap-1 px-2 py-0.5 text-xs bg-zinc-700 hover:bg-zinc-650 text-zinc-100 rounded"
         >
-          <span>{tag}</span>
+          <span className="truncate">{tag}</span>
           <button 
             type="button"
             onClick={() => removeTag(idx)} 

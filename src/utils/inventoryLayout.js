@@ -2,16 +2,24 @@ export const CHEST_SIZES = [9, 18, 27, 36, 45, 54];
 
 export const INVENTORY_LAYOUTS = {
   CHEST: { label: 'Chest', count: 27, columns: 9, sizeEditable: true },
-  ANVIL: { label: 'Anvil', count: 3, columns: 3, sizeEditable: false },
-  HOPPER: { label: 'Hopper', count: 5, columns: 5, sizeEditable: false },
+  ANVIL: { label: 'Anvil', count: 3, columns: 5, sizeEditable: false },
+  BARREL: { label: 'Barrel', count: 27, columns: 9, sizeEditable: false },
+  BEACON: { label: 'Beacon', count: 1, columns: 2, sizeEditable: false },
+  BLAST_FURNACE: { label: 'Blast Furnace', count: 3, columns: 3, sizeEditable: false },
+  BREWING: { label: 'Brewing', count: 5, columns: 3, sizeEditable: false },
+  CARTOGRAPHY: { label: 'Cartography', count: 3, columns: 5, sizeEditable: false },
   DISPENSER: { label: 'Dispenser', count: 9, columns: 3, sizeEditable: false },
   DROPPER: { label: 'Dropper', count: 9, columns: 3, sizeEditable: false },
+  ENCHANTING: { label: 'Enchanting', count: 2, columns: 3, sizeEditable: false },
+  ENDER_CHEST: { label: 'Ender Chest', count: 27, columns: 9, sizeEditable: false },
   FURNACE: { label: 'Furnace', count: 3, columns: 3, sizeEditable: false },
-  WORKBENCH: { label: 'Workbench', count: 10, columns: 5, sizeEditable: false },
-  CRAFTING: { label: 'Crafting', count: 5, columns: 5, sizeEditable: false },
-  ENCHANTING: { label: 'Enchanting', count: 2, columns: 2, sizeEditable: false },
-  BREWING: { label: 'Brewing', count: 5, columns: 5, sizeEditable: false },
-  BEACON: { label: 'Beacon', count: 1, columns: 1, sizeEditable: false }
+  GRINDSTONE: { label: 'Grindstone', count: 3, columns: 3, sizeEditable: false },
+  HOPPER: { label: 'Hopper', count: 5, columns: 5, sizeEditable: false },
+  LOOM: { label: 'Loom', count: 4, columns: 5, sizeEditable: false },
+  PLAYER: { label: 'Player', count: 36, columns: 9, sizeEditable: false },
+  SHULKER_BOX: { label: 'Shulker Box', count: 27, columns: 9, sizeEditable: false },
+  SMOKER: { label: 'Smoker', count: 3, columns: 3, sizeEditable: false },
+  WORKBENCH: { label: 'Workbench', count: 10, columns: 5, sizeEditable: false }
 };
 
 export const normalizeInventoryType = (type) => {

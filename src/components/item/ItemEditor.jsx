@@ -8,10 +8,12 @@ import TabFlags from './tabs/TabFlags';
 import TabNBT from './tabs/TabNBT';
 import TabAdvanced from './tabs/TabAdvanced';
 import { X, Trash2, Box } from 'lucide-react';
+import ConfirmDialog from '../ui/ConfirmDialog';
 
 export default function ItemEditor() {
   const { selectedSlot, selectedItemId, items, updateItem, removeItem, addItemAtSlot, setSelectedSlot, selectItem, showToast } = useMenuStore();
   const [activeTab, setActiveTab] = useState('general'); // 'general' | 'commands' | 'requirements' | 'enchantments' | 'flags' | 'nbt' | 'advanced'
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
 
   const slotItems = getItemsAtSlot(items, selectedSlot);
   const currentItem = getItemAtSlot(items, selectedSlot, selectedItemId);
@@ -33,19 +35,20 @@ export default function ItemEditor() {
     }
   };
 
-  const handleClearConfirm = () => {
-    if (window.confirm(`Are you sure you want to clear the item configuration for slot ${selectedSlot}?`)) {
-      removeItem(selectedSlot);
-      showToast(`Cleared slot ${selectedSlot}`, 'info');
-    }
+  const handleClearConfirm = () => setIsClearConfirmOpen(true);
+
+  const handleClearItem = () => {
+    removeItem(selectedSlot);
+    showToast(`Cleared slot ${selectedSlot}`, 'info');
+    setIsClearConfirmOpen(false);
   };
 
   if (selectedSlot === null) return null;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-zinc-900 border-l border-zinc-800 select-none">
+    <div className="flex flex-col h-[78vh] lg:h-full overflow-hidden bg-zinc-900/95 border-l border-zinc-800 select-none animate-panelIn min-w-0">
       {/* Editor Panel Header */}
-      <div className="h-14 px-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50 shrink-0">
+      <div className="h-14 px-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/70 shrink-0">
         <div className="flex flex-col">
           <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest font-mono">Editor Panel</span>
           <span className="text-xs font-semibold text-zinc-200">Slot Index #{selectedSlot}</span>
@@ -96,14 +99,14 @@ export default function ItemEditor() {
             </div>
           )}
           {/* Tabs Navigation Row */}
-          <div className="h-10 border-b border-zinc-800 bg-zinc-900/30 flex overflow-x-auto scrollbar-none shrink-0">
+          <div className="border-b border-zinc-800 bg-zinc-900/30 grid grid-cols-4 sm:flex sm:overflow-x-auto shrink-0">
             {tabs.map(t => {
               const isActive = activeTab === t.id;
               return (
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`px-3 text-[10px] font-semibold uppercase tracking-wider border-b-2 whitespace-nowrap transition-all duration-150 ${
+                  className={`min-w-0 px-1.5 sm:px-3 py-2 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider border-b-2 truncate transition-all duration-150 ${
                     isActive
                       ? 'border-indigo-500 text-indigo-400 bg-zinc-850/50'
                       : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-850/20'
@@ -116,7 +119,7 @@ export default function ItemEditor() {
           </div>
 
           {/* Form Work Area (Scrollable text fields) */}
-          <div className="flex-1 overflow-y-auto p-4 select-text">
+          <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-4 sm:p-4 select-text">
             {activeTab === 'general' && (
               <TabGeneral item={currentItem} updateItem={updateItem} />
             )}
@@ -140,9 +143,19 @@ export default function ItemEditor() {
             )}
           </div>
 
+          <ConfirmDialog
+            isOpen={isClearConfirmOpen}
+            onClose={() => setIsClearConfirmOpen(false)}
+            onConfirm={handleClearItem}
+            title="Clear slot config?"
+            message={`This removes the item configuration for slot ${selectedSlot}.`}
+            confirmLabel="Clear Config"
+            tone="danger"
+          />
+
           {/* Bottom Actions Footer */}
-          <div className="p-3 border-t border-zinc-800 bg-zinc-900/50 shrink-0 flex items-center justify-between">
-            <span className="text-[10px] text-zinc-500 font-mono">
+          <div className="p-3 border-t border-zinc-800 bg-zinc-900/70 shrink-0 flex items-center justify-between gap-3">
+            <span className="text-[10px] text-zinc-500 font-mono truncate min-w-0">
               ID: {currentItem.id}
             </span>
             <button

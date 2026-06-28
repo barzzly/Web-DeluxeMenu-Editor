@@ -1,6 +1,32 @@
 import React from 'react';
 import { useMenuStore } from '../../store/useMenuStore';
 import { MinecraftText } from '../../utils/colorPreview';
+import { Package, Flame, Sparkles, LayoutGrid, Sword, BookOpen, FlaskConical, Gem } from 'lucide-react';
+
+const renderGhostIcon = (ghost) => {
+  if (!ghost) return <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 text-zinc-500 transition-opacity">+</span>;
+  
+  switch (ghost) {
+    case 'item':
+      return <Package className="w-4 h-4 sm:w-5 sm:h-5" />;
+    case 'fuel':
+      return <Flame className="w-4 h-4 sm:w-5 sm:h-5" />;
+    case 'sparkles':
+      return <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />;
+    case 'grid':
+      return <LayoutGrid className="w-4 h-4 sm:w-5 sm:h-5" />;
+    case 'swords':
+      return <Sword className="w-4 h-4 sm:w-5 sm:h-5" />;
+    case 'book':
+      return <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />;
+    case 'potion':
+      return <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5" />;
+    case 'lapis':
+      return <Gem className="w-4 h-4 sm:w-5 sm:h-5" />;
+    default:
+      return null;
+  }
+};
 
 export default function SlotCell({ 
   slotIndex, 
@@ -10,7 +36,9 @@ export default function SlotCell({
   onContextMenuOpen,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  label,
+  ghost
 }) {
   const { setSelectedSlot } = useMenuStore();
 
@@ -44,7 +72,8 @@ export default function SlotCell({
       onDragStart={(e) => onDragStart(e, slotIndex)}
       onDragOver={onDragOver}
       onDrop={(e) => onDrop(e, slotIndex)}
-      className={`w-[52px] h-[52px] relative flex flex-col items-center justify-center cursor-pointer select-none group font-sans border-2 transition-all ${
+      title={label ? `${label} (Slot ${slotIndex})` : `Slot ${slotIndex}`}
+      className={`slot-cell relative flex flex-col items-center justify-center cursor-pointer select-none group font-sans border-2 transition-all ${
         isSelected
           ? 'border-indigo-500 bg-indigo-950/40 text-zinc-100 z-10 scale-105 shadow-md shadow-indigo-500/25'
           : item
@@ -97,9 +126,16 @@ export default function SlotCell({
           )}
         </div>
       ) : (
-        <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 text-zinc-500 transition-opacity">
-          +
-        </span>
+        <div className="flex flex-col items-center justify-center w-full h-full relative">
+          <div className="opacity-15 group-hover:opacity-30 transition-opacity text-zinc-500 flex items-center justify-center w-full h-full">
+            {renderGhostIcon(ghost)}
+          </div>
+          {label && (
+            <span className="absolute bottom-[2px] left-[2px] right-[2px] text-[7px] text-zinc-500 font-sans tracking-tight leading-none truncate opacity-60 group-hover:opacity-100 text-center select-none pointer-events-none">
+              {label.split(' ')[0]}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );

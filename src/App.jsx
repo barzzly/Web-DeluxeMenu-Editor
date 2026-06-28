@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import PanelLayout from './components/layout/PanelLayout';
 import { useMenuStore } from './store/useMenuStore';
 import { AlertCircle, CheckCircle, Info } from 'lucide-react';
+import ConfirmDialog from './components/ui/ConfirmDialog';
 
 function App() {
   const {
@@ -13,6 +14,7 @@ function App() {
     removeItem,
     setSelectedSlot
   } = useMenuStore();
+  const [slotToClear, setSlotToClear] = React.useState(null);
 
   // Keyboard Shortcuts Listener
   useEffect(() => {
@@ -36,9 +38,7 @@ function App() {
       // Delete key to clear slot
       if ((e.key === 'Delete' || e.key === 'Backspace') && !isInput && selectedSlot !== null) {
         e.preventDefault();
-        if (window.confirm(`Clear configuration for slot ${selectedSlot}?`)) {
-          removeItem(selectedSlot);
-        }
+        setSlotToClear(selectedSlot);
       }
 
       // Ctrl + Z (Undo) / Ctrl + Shift + Z (Redo)
@@ -77,13 +77,26 @@ function App() {
   }, [toast, clearToast]);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
+    <div className="app-shell relative w-screen min-h-screen lg:h-screen overflow-x-hidden lg:overflow-hidden">
       {/* Primary Dashboard Panel Layout */}
       <PanelLayout />
 
+      <ConfirmDialog
+        isOpen={slotToClear !== null}
+        onClose={() => setSlotToClear(null)}
+        onConfirm={() => {
+          removeItem(slotToClear);
+          setSlotToClear(null);
+        }}
+        title="Clear slot config?"
+        message={slotToClear !== null ? `This removes the item configuration for slot ${slotToClear}.` : ''}
+        confirmLabel="Clear Config"
+        tone="danger"
+      />
+
       {/* Custom Toast Alert Banner */}
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[100] flex items-center gap-2.5 px-4 py-3 rounded-lg border bg-zinc-900 shadow-2xl text-xs font-medium animate-slideIn">
+        <div className="fixed inset-x-3 bottom-3 sm:inset-x-auto sm:bottom-5 sm:right-5 z-[100] flex items-center gap-2.5 px-4 py-3 rounded-lg border border-zinc-800/80 bg-zinc-900/95 shadow-2xl shadow-black/30 text-xs font-medium animate-slideIn backdrop-blur">
           {toast.type === 'success' && (
             <>
               <CheckCircle size={15} className="text-emerald-400" />

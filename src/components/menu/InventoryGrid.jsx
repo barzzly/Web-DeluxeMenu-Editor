@@ -2,9 +2,218 @@ import React, { useState, useEffect } from 'react';
 import { useMenuStore, getItemAtSlot, getItemsAtSlot } from '../../store/useMenuStore';
 import SlotCell from './SlotCell';
 import Modal from '../ui/Modal';
-import { Copy, Trash, Edit2 } from 'lucide-react';
+import { Copy, Trash, Edit2, Flame, ArrowRight, ArrowDown, Plus, BookOpen, Zap, FlaskConical } from 'lucide-react';
 import { MinecraftText } from '../../utils/colorPreview';
 import { getInventoryLayout } from '../../utils/inventoryLayout';
+
+const CUSTOM_LAYOUTS = {
+  FURNACE: {
+    columns: 3,
+    rows: 3,
+    cells: [
+      { type: 'slot', index: 0, label: 'Input Item', ghost: 'item' },
+      { type: 'empty' },
+      { type: 'empty' },
+      { type: 'decorator', icon: 'flame', label: 'Fuel Heat' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Smelting Progress' },
+      { type: 'slot', index: 2, label: 'Output Result', ghost: 'sparkles' },
+      { type: 'slot', index: 1, label: 'Fuel Source', ghost: 'fuel' },
+      { type: 'empty' },
+      { type: 'empty' }
+    ]
+  },
+  BLAST_FURNACE: {
+    columns: 3,
+    rows: 3,
+    cells: [
+      { type: 'slot', index: 0, label: 'Ore Input', ghost: 'item' },
+      { type: 'empty' },
+      { type: 'empty' },
+      { type: 'decorator', icon: 'flame', label: 'Fuel Heat' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Smelting Progress' },
+      { type: 'slot', index: 2, label: 'Smelted Result', ghost: 'sparkles' },
+      { type: 'slot', index: 1, label: 'Fuel Source', ghost: 'fuel' },
+      { type: 'empty' },
+      { type: 'empty' }
+    ]
+  },
+  SMOKER: {
+    columns: 3,
+    rows: 3,
+    cells: [
+      { type: 'slot', index: 0, label: 'Food Input', ghost: 'item' },
+      { type: 'empty' },
+      { type: 'empty' },
+      { type: 'decorator', icon: 'flame', label: 'Fuel Heat' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Cooking Progress' },
+      { type: 'slot', index: 2, label: 'Cooked Result', ghost: 'sparkles' },
+      { type: 'slot', index: 1, label: 'Fuel Source', ghost: 'fuel' },
+      { type: 'empty' },
+      { type: 'empty' }
+    ]
+  },
+  WORKBENCH: {
+    columns: 5,
+    rows: 3,
+    cells: [
+      { type: 'slot', index: 1, label: 'Craft Grid Col 1', ghost: 'grid' },
+      { type: 'slot', index: 2, label: 'Craft Grid Col 2', ghost: 'grid' },
+      { type: 'slot', index: 3, label: 'Craft Grid Col 3', ghost: 'grid' },
+      { type: 'empty' },
+      { type: 'empty' },
+      { type: 'slot', index: 4, label: 'Craft Grid Col 1', ghost: 'grid' },
+      { type: 'slot', index: 5, label: 'Craft Grid Col 2', ghost: 'grid' },
+      { type: 'slot', index: 6, label: 'Craft Grid Col 3', ghost: 'grid' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Crafting Output' },
+      { type: 'slot', index: 0, label: 'Crafting Result', ghost: 'sparkles' },
+      { type: 'slot', index: 7, label: 'Craft Grid Col 1', ghost: 'grid' },
+      { type: 'slot', index: 8, label: 'Craft Grid Col 2', ghost: 'grid' },
+      { type: 'slot', index: 9, label: 'Craft Grid Col 3', ghost: 'grid' },
+      { type: 'empty' },
+      { type: 'empty' }
+    ]
+  },
+  ANVIL: {
+    columns: 5,
+    rows: 1,
+    cells: [
+      { type: 'slot', index: 0, label: 'Repair Item', ghost: 'swords' },
+      { type: 'decorator', icon: 'plus', label: 'Combine' },
+      { type: 'slot', index: 1, label: 'Book / Material', ghost: 'book' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Repair Progress' },
+      { type: 'slot', index: 2, label: 'Repair Result', ghost: 'sparkles' }
+    ]
+  },
+  BREWING: {
+    columns: 3,
+    rows: 3,
+    cells: [
+      { type: 'slot', index: 1, label: 'Blaze Powder Fuel', ghost: 'fuel' },
+      { type: 'slot', index: 0, label: 'Ingredient Slot', ghost: 'item' },
+      { type: 'empty' },
+      { type: 'decorator', icon: 'flame', label: 'Brewing Active' },
+      { type: 'decorator', icon: 'arrow-down', label: 'Distill Progress' },
+      { type: 'empty' },
+      { type: 'slot', index: 2, label: 'Potion Potion Left', ghost: 'potion' },
+      { type: 'slot', index: 3, label: 'Potion Potion Middle', ghost: 'potion' },
+      { type: 'slot', index: 4, label: 'Potion Potion Right', ghost: 'potion' }
+    ]
+  },
+  ENCHANTING: {
+    columns: 3,
+    rows: 1,
+    cells: [
+      { type: 'slot', index: 0, label: 'Enchant Item', ghost: 'swords' },
+      { type: 'slot', index: 1, label: 'Lapis Lazuli', ghost: 'lapis' },
+      { type: 'decorator', icon: 'book', label: 'Enchantments' }
+    ]
+  },
+  BEACON: {
+    columns: 2,
+    rows: 1,
+    cells: [
+      { type: 'slot', index: 0, label: 'Payment Item', ghost: 'lapis' },
+      { type: 'decorator', icon: 'beacon', label: 'Beacon Active' }
+    ]
+  },
+  LOOM: {
+    columns: 5,
+    rows: 1,
+    cells: [
+      { type: 'slot', index: 0, label: 'Banner Pattern', ghost: 'item' },
+      { type: 'slot', index: 1, label: 'Dye color', ghost: 'lapis' },
+      { type: 'slot', index: 2, label: 'Banner Template', ghost: 'item' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Weaving Result' },
+      { type: 'slot', index: 3, label: 'Loom Output', ghost: 'sparkles' }
+    ]
+  },
+  CARTOGRAPHY: {
+    columns: 5,
+    rows: 1,
+    cells: [
+      { type: 'slot', index: 0, label: 'Input Map', ghost: 'item' },
+      { type: 'decorator', icon: 'plus', label: 'Modifier Input' },
+      { type: 'slot', index: 1, label: 'Paper / Glass Pane', ghost: 'item' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Mapping Result' },
+      { type: 'slot', index: 2, label: 'Output Map', ghost: 'sparkles' }
+    ]
+  },
+  GRINDSTONE: {
+    columns: 3,
+    rows: 2,
+    cells: [
+      { type: 'slot', index: 0, label: 'Grind Item 1', ghost: 'swords' },
+      { type: 'empty' },
+      { type: 'empty' },
+      { type: 'slot', index: 1, label: 'Grind Item 2', ghost: 'swords' },
+      { type: 'decorator', icon: 'arrow-right', label: 'Disenchant Output' },
+      { type: 'slot', index: 2, label: 'Grinded Result', ghost: 'sparkles' }
+    ]
+  },
+  PLAYER: {
+    columns: 9,
+    rows: 4,
+    cells: [
+      { type: 'slot', index: 9, label: 'Inventory 9', ghost: 'item' },
+      { type: 'slot', index: 10, label: 'Inventory 10', ghost: 'item' },
+      { type: 'slot', index: 11, label: 'Inventory 11', ghost: 'item' },
+      { type: 'slot', index: 12, label: 'Inventory 12', ghost: 'item' },
+      { type: 'slot', index: 13, label: 'Inventory 13', ghost: 'item' },
+      { type: 'slot', index: 14, label: 'Inventory 14', ghost: 'item' },
+      { type: 'slot', index: 15, label: 'Inventory 15', ghost: 'item' },
+      { type: 'slot', index: 16, label: 'Inventory 16', ghost: 'item' },
+      { type: 'slot', index: 17, label: 'Inventory 17', ghost: 'item' },
+      { type: 'slot', index: 18, label: 'Inventory 18', ghost: 'item' },
+      { type: 'slot', index: 19, label: 'Inventory 19', ghost: 'item' },
+      { type: 'slot', index: 20, label: 'Inventory 20', ghost: 'item' },
+      { type: 'slot', index: 21, label: 'Inventory 21', ghost: 'item' },
+      { type: 'slot', index: 22, label: 'Inventory 22', ghost: 'item' },
+      { type: 'slot', index: 23, label: 'Inventory 23', ghost: 'item' },
+      { type: 'slot', index: 24, label: 'Inventory 24', ghost: 'item' },
+      { type: 'slot', index: 25, label: 'Inventory 25', ghost: 'item' },
+      { type: 'slot', index: 26, label: 'Inventory 26', ghost: 'item' },
+      { type: 'slot', index: 27, label: 'Inventory 27', ghost: 'item' },
+      { type: 'slot', index: 28, label: 'Inventory 28', ghost: 'item' },
+      { type: 'slot', index: 29, label: 'Inventory 29', ghost: 'item' },
+      { type: 'slot', index: 30, label: 'Inventory 30', ghost: 'item' },
+      { type: 'slot', index: 31, label: 'Inventory 31', ghost: 'item' },
+      { type: 'slot', index: 32, label: 'Inventory 32', ghost: 'item' },
+      { type: 'slot', index: 33, label: 'Inventory 33', ghost: 'item' },
+      { type: 'slot', index: 34, label: 'Inventory 34', ghost: 'item' },
+      { type: 'slot', index: 35, label: 'Inventory 35', ghost: 'item' },
+      { type: 'slot', index: 0, label: 'Hotbar 0', ghost: 'item' },
+      { type: 'slot', index: 1, label: 'Hotbar 1', ghost: 'item' },
+      { type: 'slot', index: 2, label: 'Hotbar 2', ghost: 'item' },
+      { type: 'slot', index: 3, label: 'Hotbar 3', ghost: 'item' },
+      { type: 'slot', index: 4, label: 'Hotbar 4', ghost: 'item' },
+      { type: 'slot', index: 5, label: 'Hotbar 5', ghost: 'item' },
+      { type: 'slot', index: 6, label: 'Hotbar 6', ghost: 'item' },
+      { type: 'slot', index: 7, label: 'Hotbar 7', ghost: 'item' },
+      { type: 'slot', index: 8, label: 'Hotbar 8', ghost: 'item' }
+    ]
+  }
+};
+
+const renderDecoratorIcon = (icon) => {
+  switch (icon) {
+    case 'flame':
+      return <Flame className="w-5 h-5 text-orange-500 animate-pulse" />;
+    case 'arrow-right':
+      return <ArrowRight className="w-5 h-5 text-zinc-500" />;
+    case 'arrow-down':
+      return <ArrowDown className="w-5 h-5 text-zinc-500" />;
+    case 'plus':
+      return <Plus className="w-5 h-5 text-zinc-600" />;
+    case 'book':
+      return <BookOpen className="w-5 h-5 text-purple-400" />;
+    case 'beacon':
+      return <Zap className="w-5 h-5 text-sky-400 animate-pulse" />;
+    case 'brewing_stand':
+      return <FlaskConical className="w-5 h-5 text-emerald-400" />;
+    default:
+      return null;
+  }
+};
 
 export default function InventoryGrid() {
   const {
@@ -125,28 +334,74 @@ export default function InventoryGrid() {
 
   // Build cells array
   const cells = [];
-  for (let i = 0; i < layout.count; i++) {
-    const slotItems = getItemsAtSlot(items, i);
-    const item = slotItems[0] || null;
-    cells.push(
-      <SlotCell
-        key={i}
-        slotIndex={i}
-        item={item}
-        itemCount={slotItems.length}
-        isSelected={selectedSlot === i}
-        onContextMenuOpen={handleContextMenuOpen}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      />
-    );
+  const customLayout = CUSTOM_LAYOUTS[layout.type];
+  const gridColumns = customLayout ? customLayout.columns : layout.columns;
+
+  if (customLayout) {
+    customLayout.cells.forEach((cell, idx) => {
+      if (cell.type === 'slot') {
+        const slotItems = getItemsAtSlot(items, cell.index);
+        const item = slotItems[0] || null;
+        cells.push(
+          <SlotCell
+            key={`slot-${cell.index}`}
+            slotIndex={cell.index}
+            item={item}
+            itemCount={slotItems.length}
+            isSelected={selectedSlot === cell.index}
+            onContextMenuOpen={handleContextMenuOpen}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            label={cell.label}
+            ghost={cell.ghost}
+          />
+        );
+      } else if (cell.type === 'decorator') {
+        cells.push(
+          <div
+            key={`decorator-${idx}`}
+            className="slot-cell flex flex-col items-center justify-center border-2 border-transparent text-zinc-600 transition-all select-none relative group cursor-help bg-zinc-900/10 rounded"
+          >
+            {renderDecoratorIcon(cell.icon)}
+            <span className="absolute bottom-[2px] text-[7px] text-zinc-500 font-mono scale-90 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-zinc-950/90 border border-zinc-800 px-1 rounded z-20 pointer-events-none">
+              {cell.label}
+            </span>
+          </div>
+        );
+      } else {
+        cells.push(
+          <div
+            key={`empty-${idx}`}
+            className="slot-cell border-2 border-transparent transition-all select-none opacity-20"
+          />
+        );
+      }
+    });
+  } else {
+    for (let i = 0; i < layout.count; i++) {
+      const slotItems = getItemsAtSlot(items, i);
+      const item = slotItems[0] || null;
+      cells.push(
+        <SlotCell
+          key={`slot-${i}`}
+          slotIndex={i}
+          item={item}
+          itemCount={slotItems.length}
+          isSelected={selectedSlot === i}
+          onContextMenuOpen={handleContextMenuOpen}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        />
+      );
+    }
   }
 
   return (
-    <div className="relative flex flex-col items-center select-none animate-fadeIn">
+    <div className="relative flex w-full flex-col items-center select-none animate-fadeIn">
       {/* Visual Chest Container (Minecraft UI Texture mimic) */}
-      <div className="inventory-shell bg-zinc-800 border-[4px] border-t-zinc-600 border-l-zinc-600 border-r-zinc-950 border-b-zinc-950 p-3 sm:p-4 rounded shadow-2xl flex flex-col gap-3 w-max max-w-full">
+      <div className="inventory-shell bg-zinc-800/95 border-[4px] border-t-zinc-600 border-l-zinc-600 border-r-zinc-950 border-b-zinc-950 p-2.5 sm:p-4 rounded shadow-2xl shadow-black/40 flex flex-col gap-3 w-max max-w-full">
         {/* Chest GUI Header */}
         <div className="flex items-center justify-between border-b border-zinc-900 pb-2 px-1">
           <span className="text-xs font-bold tracking-wide font-sans text-zinc-300">
@@ -158,17 +413,17 @@ export default function InventoryGrid() {
         </div>
 
         {/* Chest Slots Grid */}
-        <div className="bg-zinc-950 p-1 rounded border border-zinc-950 overflow-x-auto">
+        <div className="bg-zinc-950/95 p-1.5 rounded border border-zinc-950 overflow-x-auto max-w-full">
           <div
-            className="grid gap-[2px]"
-            style={{ gridTemplateColumns: `repeat(${layout.columns}, minmax(0, 1fr))` }}
+            className="inventory-grid grid gap-[3px] justify-center items-center justify-items-center"
+            style={{ gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }}
           >
             {cells}
           </div>
         </div>
       </div>
 
-      <div className="mt-4 text-[10px] text-zinc-500 font-mono text-center max-w-sm">
+      <div className="mt-4 px-3 text-[10px] text-zinc-500 font-mono text-center max-w-sm">
         Left-click slot to edit. Right-click for options. Drag items to rearrange them.
       </div>
 

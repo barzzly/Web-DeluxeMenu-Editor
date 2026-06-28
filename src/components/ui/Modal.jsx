@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
@@ -21,7 +21,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-[12vh] sm:pt-[10vh]">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
@@ -29,9 +29,9 @@ export default function Modal({ isOpen, onClose, title, children }) {
       />
 
       {/* Modal Content Card */}
-      <div className="relative w-full max-w-lg overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 shadow-2xl transition-all max-h-[85vh] flex flex-col">
+      <div className={`relative w-full ${maxWidth} overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 shadow-2xl transition-all max-h-[82vh] flex flex-col animate-panelIn`}>
         {/* Header */}
-        <div className="flex items-center justify-between border-bottom border-zinc-800 px-5 py-4 bg-zinc-900/50">
+        <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4 bg-zinc-900/50">
           <h3 className="text-base font-semibold text-zinc-100">{title}</h3>
           <button 
             onClick={onClose}

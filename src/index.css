@@ -8,6 +8,35 @@
   }
 }
 
+.app-shell {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(99, 102, 241, 0.16), transparent 28rem),
+    radial-gradient(circle at 88% 18%, rgba(20, 184, 166, 0.12), transparent 24rem),
+    linear-gradient(135deg, #09090b 0%, #111113 48%, #0b1020 100%);
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: -40% -20%;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.055), transparent 55%);
+  animation: ambientSweep 11s ease-in-out infinite;
+  opacity: 0.45;
+}
+
 /* Custom Minecraft color formatting styles */
 .mc-black { color: #000000; }
 .mc-dark_blue { color: #0000AA; }
@@ -86,5 +115,101 @@ button:active:not(:disabled) {
 
 @media (max-width: 640px) {
   body { overflow-x: hidden; }
-  .inventory-shell { transform-origin: top left; }
+  .inventory-shell { transform-origin: top center; }
+  .mobile-scroll-pad { padding-bottom: 1.5rem; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ambientSweep {
+  0%, 100% { transform: translateX(-10%) translateY(0); }
+  50% { transform: translateX(10%) translateY(4%); }
+}
+
+.animate-panelIn { animation: panelIn 260ms ease-out both; }
+
+.slot-cell {
+  width: var(--slot-size, 52px);
+  height: var(--slot-size, 52px);
+}
+
+.inventory-grid {
+  --slot-size: clamp(35px, 10.25vw, 52px);
+}
+
+.mobile-action-strip {
+  scrollbar-width: none;
+}
+.mobile-action-strip::-webkit-scrollbar {
+  display: none;
+}
+html.light body {
+  background: #f8fafc;
+  color: #18181b;
+}
+
+html.light .app-shell {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(79, 70, 229, 0.12), transparent 28rem),
+    radial-gradient(circle at 88% 18%, rgba(20, 184, 166, 0.10), transparent 24rem),
+    linear-gradient(135deg, #f8fafc 0%, #eef2ff 48%, #ecfeff 100%);
+}
+
+html.light .app-shell::before {
+  background-image:
+    linear-gradient(rgba(24,24,27,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24,24,27,0.055) 1px, transparent 1px);
+}
+
+html.light .app-shell::after {
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.65), transparent 55%);
+  opacity: 0.65;
+}
+
+html.light [class*="bg-zinc-950"] { background-color: rgba(248, 250, 252, 0.92) !important; }
+html.light [class*="bg-zinc-900"] { background-color: rgba(255, 255, 255, 0.86) !important; }
+html.light [class*="bg-zinc-850"] { background-color: rgba(244, 244, 245, 0.9) !important; }
+html.light [class*="bg-zinc-800"] { background-color: rgba(228, 228, 231, 0.82) !important; }
+html.light [class*="bg-zinc-700"] { background-color: rgba(212, 212, 216, 0.95) !important; }
+
+html.light [class*="border-zinc-950"],
+html.light [class*="border-zinc-900"],
+html.light [class*="border-zinc-850"],
+html.light [class*="border-zinc-800"],
+html.light [class*="border-zinc-700"] {
+  border-color: rgba(212, 212, 216, 0.9) !important;
+}
+
+html.light [class*="text-zinc-100"],
+html.light [class*="text-zinc-200"],
+html.light [class*="text-zinc-300"] {
+  color: #18181b !important;
+}
+
+html.light [class*="text-zinc-400"],
+html.light [class*="text-zinc-500"],
+html.light [class*="text-zinc-600"],
+html.light [class*="text-zinc-650"] {
+  color: #52525b !important;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+  color: #18181b !important;
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+html.light ::-webkit-scrollbar-track { background: #f4f4f5; }
+html.light ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
