@@ -37,21 +37,42 @@ export default function TabAdvanced({ item, updateItem }) {
   const [bannerColor, setBannerColor] = useState('WHITE');
   const [bannerPattern, setBannerPattern] = useState('SKULL');
 
+  const normalizePotionEffect = (effect) => {
+    if (!effect) return null;
+    if (typeof effect === 'string') {
+      const [id, duration = 600, amplifier = 0] = effect.split(/[;:]/);
+      return {
+        id: id || 'SPEED',
+        duration: parseInt(duration, 10) || 600,
+        amplifier: parseInt(amplifier, 10) || 0
+      };
+    }
+    return {
+      id: effect.id || effect.type || 'SPEED',
+      duration: parseInt(effect.duration, 10) || 600,
+      amplifier: parseInt(effect.amplifier, 10) || 0
+    };
+  };
+
+  const potionEffects = (item.potion_effects || [])
+    .map(normalizePotionEffect)
+    .filter(Boolean);
+  const selectedPotionExists = potionEffects.some(effect => effect.id === potionEffectType);
+
   // Potion Action Handlers
   const handleAddPotion = () => {
-    const current = [...(item.potion_effects || [])];
-    if (current.some(p => p.id === potionEffectType)) return;
-    
-    current.push({
+    const nextEffect = {
       id: potionEffectType,
-      duration: parseInt(potionDuration, 10) || 600,
-      amplifier: parseInt(potionAmplifier, 10) || 0
-    });
-    updateItem(item.slot, { potion_effects: current });
+      duration: Math.max(1, parseInt(potionDuration, 10) || 600),
+      amplifier: Math.max(0, parseInt(potionAmplifier, 10) || 0)
+    };
+
+    const current = potionEffects.filter(effect => effect.id !== potionEffectType);
+    updateItem(item.slot, { potion_effects: [...current, nextEffect] });
   };
 
   const handleRemovePotion = (effectId) => {
-    const current = (item.potion_effects || []).filter(p => p.id !== effectId);
+    const current = potionEffects.filter(effect => effect.id !== effectId);
     updateItem(item.slot, { potion_effects: current });
   };
 
@@ -74,7 +95,7 @@ export default function TabAdvanced({ item, updateItem }) {
   const isBannerMaterial = item.material && ['BANNER', 'SHIELD'].some(m => item.material.includes(m));
 
   return (
-    <div className="flex flex-col gap-4 text-xs">
+    <div className="flex min-w-0 flex-col gap-4 text-xs">
       {/* Lore Append Mode */}
       <div className="flex flex-col gap-1.5">
         <span className="font-semibold text-zinc-400 uppercase tracking-wide">Lore Append Mode</span>
@@ -107,28 +128,28 @@ export default function TabAdvanced({ item, updateItem }) {
       </div>
 
       {/* Potion Effects Section */}
-      <div className={`border-t border-zinc-800/60 pt-4 flex flex-col gap-3 ${isPotionMaterial ? 'ring-1 ring-indigo-500/20 p-2 rounded bg-indigo-950/5' : ''}`}>
-        <div className="flex justify-between items-center">
+      <div className={`min-w-0 border-t border-zinc-800/60 pt-4 flex flex-col gap-3 ${isPotionMaterial ? 'ring-1 ring-indigo-500/20 p-2 rounded bg-indigo-950/5' : ''}`}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="font-semibold text-zinc-400 uppercase tracking-wide">Potion Modifiers</span>
           {isPotionMaterial && <span className="text-[9px] text-indigo-400 font-medium">Recommended for Potions</span>}
         </div>
 
         {/* Add Potion Effect controls */}
-        <div className="flex flex-col gap-2.5 bg-zinc-950/20 p-2.5 rounded border border-zinc-900">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="flex min-w-0 flex-col gap-2.5 bg-zinc-950/20 p-2.5 rounded border border-zinc-900">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="flex flex-col gap-1">
               <span className="text-[9px] text-zinc-500">Effect Type</span>
               <select
                 value={potionEffectType}
                 onChange={(e) => setPotionEffectType(e.target.value)}
-                className="h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
+                className="min-w-0 h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
               >
                 {POTION_EFFECTS.map(effect => (
                   <option key={effect} value={effect}>{effect}</option>
                 ))}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="flex flex-col gap-1">
                 <span className="text-[9px] text-zinc-500">Duration (ticks)</span>
                 <input
@@ -136,7 +157,7 @@ export default function TabAdvanced({ item, updateItem }) {
                   min="20"
                   value={potionDuration}
                   onChange={(e) => setPotionDuration(parseInt(e.target.value, 10) || 20)}
-                  className="h-8 px-1.5 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none font-mono text-[10px] text-center"
+                  className="min-w-0 h-8 px-1.5 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none font-mono text-[10px] text-center"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -146,7 +167,7 @@ export default function TabAdvanced({ item, updateItem }) {
                   min="0"
                   value={potionAmplifier}
                   onChange={(e) => setPotionAmplifier(parseInt(e.target.value, 10) || 0)}
-                  className="h-8 px-1.5 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none font-mono text-[10px] text-center"
+                  className="min-w-0 h-8 px-1.5 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none font-mono text-[10px] text-center"
                 />
               </div>
             </div>
@@ -157,16 +178,16 @@ export default function TabAdvanced({ item, updateItem }) {
             className="w-full h-7 bg-zinc-800 hover:bg-zinc-750 text-[10px] font-medium text-zinc-200 rounded flex items-center justify-center gap-1 transition-colors border border-zinc-850"
           >
             <Plus size={12} />
-            <span>Add Potion Effect</span>
+            <span>{selectedPotionExists ? 'Update Potion Effect' : 'Add Potion Effect'}</span>
           </button>
         </div>
 
         {/* Potions List */}
-        {item.potion_effects && item.potion_effects.length > 0 ? (
-          <div className="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1">
-            {item.potion_effects.map(effect => (
-              <div key={effect.id} className="flex justify-between items-center bg-zinc-900/30 px-3 py-1.5 border border-zinc-850 rounded">
-                <div className="flex gap-1.5 items-center font-mono text-[10px]">
+        {potionEffects.length > 0 ? (
+          <div className="flex min-w-0 flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1">
+            {potionEffects.map(effect => (
+              <div key={effect.id} className="flex min-w-0 items-center justify-between gap-2 bg-zinc-900/30 px-3 py-1.5 border border-zinc-850 rounded">
+                <div className="flex min-w-0 flex-wrap gap-1.5 items-center font-mono text-[10px]">
                   <span className="text-zinc-300 font-semibold">{effect.id}</span>
                   <span className="text-zinc-500 font-normal">({effect.duration}t, lvl {effect.amplifier + 1})</span>
                 </div>
@@ -189,7 +210,7 @@ export default function TabAdvanced({ item, updateItem }) {
 
       {/* Banner / Shield metadata section */}
       <div className={`border-t border-zinc-800/60 pt-4 flex flex-col gap-3 ${isBannerMaterial ? 'ring-1 ring-indigo-500/20 p-2 rounded bg-indigo-950/5' : ''}`}>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="font-semibold text-zinc-400 uppercase tracking-wide">Banner Meta (Shield/Banner only)</span>
           {isBannerMaterial && <span className="text-[9px] text-indigo-400 font-medium">Recommended for Banners</span>}
         </div>
@@ -212,13 +233,13 @@ export default function TabAdvanced({ item, updateItem }) {
 
           {/* Add Layer Pattern */}
           <div className="bg-zinc-950/20 p-2.5 rounded border border-zinc-900 flex flex-col gap-2">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="flex flex-col gap-1">
                 <span className="text-[9px] text-zinc-500">Pattern Color</span>
                 <select
                   value={bannerColor}
                   onChange={(e) => setBannerColor(e.target.value)}
-                  className="h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
+                  className="min-w-0 h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
                 >
                   {dyeColors.map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -230,7 +251,7 @@ export default function TabAdvanced({ item, updateItem }) {
                 <select
                   value={bannerPattern}
                   onChange={(e) => setBannerPattern(e.target.value)}
-                  className="h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
+                  className="min-w-0 h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
                 >
                   {bannerPatterns.map(p => (
                     <option key={p} value={p}>{p}</option>
@@ -251,10 +272,10 @@ export default function TabAdvanced({ item, updateItem }) {
 
         {/* Pattern List */}
         {item.banner_meta && item.banner_meta.length > 0 ? (
-          <div className="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1">
+          <div className="flex min-w-0 flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1">
             {item.banner_meta.map((bMeta, idx) => (
-              <div key={idx} className="flex justify-between items-center bg-zinc-900/30 px-3 py-1.5 border border-zinc-850 rounded">
-                <div className="flex gap-1.5 items-center font-mono text-[10px]">
+              <div key={idx} className="flex min-w-0 items-center justify-between gap-2 bg-zinc-900/30 px-3 py-1.5 border border-zinc-850 rounded">
+                <div className="flex min-w-0 flex-wrap gap-1.5 items-center font-mono text-[10px]">
                   <span className="text-zinc-500">Layer {idx + 1}:</span>
                   <span className="text-zinc-300 font-semibold">{bMeta.color} {bMeta.pattern}</span>
                 </div>
@@ -279,13 +300,13 @@ export default function TabAdvanced({ item, updateItem }) {
       <div className="border-t border-zinc-800/60 pt-4 flex flex-col gap-3">
         <span className="font-semibold text-zinc-400 uppercase tracking-wide">Armor Trim Modifiers</span>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div className="flex flex-col gap-1">
             <span className="text-[9px] text-zinc-500 font-medium">Trim Material</span>
             <select
               value={item.trim_material || ''}
               onChange={(e) => updateItem(item.slot, { trim_material: e.target.value })}
-              className="h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
+              className="min-w-0 h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
             >
               <option value="">None</option>
               {trimMaterials.map(m => (
@@ -299,7 +320,7 @@ export default function TabAdvanced({ item, updateItem }) {
             <select
               value={item.trim_pattern || ''}
               onChange={(e) => updateItem(item.slot, { trim_pattern: e.target.value })}
-              className="h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
+              className="min-w-0 h-8 px-2 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none text-[10px] cursor-pointer"
             >
               <option value="">None</option>
               {trimPatterns.map(p => (

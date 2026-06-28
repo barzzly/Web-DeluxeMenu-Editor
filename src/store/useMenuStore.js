@@ -15,6 +15,25 @@ const normalizeList = (value) => {
   return Array.isArray(value) ? value : [value];
 };
 
+const normalizePotionEffects = (value) => normalizeList(value)
+  .map((effect) => {
+    if (!effect) return null;
+    if (typeof effect === 'string') {
+      const [id, duration = 600, amplifier = 0] = effect.split(/[;:]/);
+      return {
+        id: id || 'SPEED',
+        duration: parseInt(duration, 10) || 600,
+        amplifier: parseInt(amplifier, 10) || 0
+      };
+    }
+    return {
+      id: effect.id || effect.type || 'SPEED',
+      duration: parseInt(effect.duration, 10) || 600,
+      amplifier: parseInt(effect.amplifier, 10) || 0
+    };
+  })
+  .filter(Boolean);
+
 const normalizeSlots = (value) => {
   if (!value) return [];
   const values = Array.isArray(value) ? value : [value];
@@ -292,7 +311,7 @@ export const useMenuStore = create((set, get) => ({
             rgb: rawItem.rgb || '',
             item_flags: normalizeList(rawItem.item_flags),
             enchantments: normalizeList(rawItem.enchantments),
-            potion_effects: normalizeList(rawItem.potion_effects),
+            potion_effects: normalizePotionEffects(rawItem.potion_effects),
             banner_meta: normalizeList(rawItem.banner_meta),
             base_color: rawItem.base_color || '',
             light_level: rawItem.light_level ?? null,
