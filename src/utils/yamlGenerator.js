@@ -1,4 +1,5 @@
 import { dump } from 'js-yaml';
+import { getInventoryLayout } from './inventoryLayout';
 
 const cleanRequirement = (req) => {
   if (!req) return undefined;
@@ -149,11 +150,12 @@ export function generateYaml(storeState) {
   
   if (storeState.menu_title) root.menu_title = storeState.menu_title;
   if (storeState.open_command) root.open_command = storeState.open_command;
-  
-  root.size = Number(storeState.size) || 27;
 
-  if (storeState.inventory_type && storeState.inventory_type !== 'CHEST') {
-    root.inventory_type = storeState.inventory_type;
+  const layout = getInventoryLayout(storeState.inventory_type, storeState.size);
+  if (layout.type === 'CHEST') {
+    root.size = layout.count;
+  } else {
+    root.inventory_type = layout.type;
   }
   
   if (storeState.update_interval !== undefined && storeState.update_interval !== null && storeState.update_interval !== '') {

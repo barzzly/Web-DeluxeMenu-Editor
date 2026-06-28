@@ -97,7 +97,7 @@ export default function TabGeneral({ item, updateItem }) {
         <input
           type="text"
           value={item.id}
-          onChange={(e) => updateItem(item.slot, { id: e.target.value.toLowerCase().replace(/[^a-z0-9_\-]/g, '') })}
+          onChange={(e) => updateItem(item.slot, { id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
           placeholder="item_0"
           className="w-full h-8 px-3 rounded border border-zinc-800 bg-zinc-800/40 text-zinc-200 outline-none focus:border-indigo-500 font-mono"
         />

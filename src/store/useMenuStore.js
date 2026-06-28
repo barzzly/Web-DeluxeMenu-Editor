@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createDefaultItem, INITIAL_MENU_STATE } from './defaults';
 import { load } from 'js-yaml';
+import { getInventoryLayout, normalizeChestSize, normalizeInventoryType } from '../utils/inventoryLayout';
 
 const cloneState = (state) => JSON.parse(JSON.stringify(state));
 
@@ -44,6 +45,11 @@ const sortByPriority = (a, b) => {
   const priorityB = Number(b.priority || 0);
   if (priorityA !== priorityB) return priorityA - priorityB;
   return String(a.id).localeCompare(String(b.id));
+};
+
+const filterItemsForLayout = (items, type, size) => {
+  const layout = getInventoryLayout(type, size);
+  return Object.fromEntries(Object.entries(items).filter(([, item]) => toSlotNumber(item.slot) < layout.count));
 };
 
 const itemOccupiesSlot = (item, slotIndex) => {
@@ -146,21 +152,32 @@ export const useMenuStore = create((set, get) => ({
 
   setMenuField: (field, value) => {
     get().pushToHistory();
+    if (field === 'inventory_type') {
+      const inventoryType = normalizeInventoryType(value);
+      const currentSize = normalizeChestSize(get().size);
+      const updatedItems = filterItemsForLayout(get().items, inventoryType, currentSize);
+      set({
+        inventory_type: inventoryType,
+        size: currentSize,
+        items: updatedItems,
+        selectedSlot: null,
+        selectedItemId: null
+      });
+      return;
+    }
     set({ [field]: value });
   },
 
   setMenuSize: (newSize) => {
     get().pushToHistory();
-    const { items, selectedSlot, selectedItemId } = get();
-    const updatedItems = {};
-    Object.entries(items).forEach(([key, item]) => {
-      if (toSlotNumber(item.slot) < newSize) updatedItems[key] = item;
-    });
+    const normalizedSize = normalizeChestSize(newSize);
+    const { items, selectedSlot, selectedItemId, inventory_type } = get();
+    const updatedItems = filterItemsForLayout(items, inventory_type, normalizedSize);
     set({
-      size: newSize,
+      size: normalizedSize,
       items: updatedItems,
       selectedItemId: updatedItems[selectedItemId] ? selectedItemId : null,
-      selectedSlot: selectedSlot !== null && selectedSlot >= newSize ? null : selectedSlot
+      selectedSlot: selectedSlot !== null && selectedSlot >= getInventoryLayout(inventory_type, normalizedSize).count ? null : selectedSlot
     });
   },
 
@@ -315,8 +332,8 @@ export const useMenuStore = create((set, get) => ({
       set({
         menu_title: parsed.menu_title || '&8My Menu',
         open_command: parsed.open_command || '',
-        size: parsed.size || 27,
-        inventory_type: parsed.inventory_type || 'CHEST',
+        size: normalizeChestSize(parsed.size || 27),
+        inventory_type: normalizeInventoryType(parsed.inventory_type || 'CHEST'),
         update_interval: parsed.update_interval ?? 20,
         open_requirement: parsed.open_requirement || null,
         open_commands: normalizeList(parsed.open_commands),

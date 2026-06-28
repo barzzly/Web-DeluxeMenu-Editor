@@ -4,6 +4,7 @@ import SlotCell from './SlotCell';
 import Modal from '../ui/Modal';
 import { Copy, Trash, Edit2 } from 'lucide-react';
 import { MinecraftText } from '../../utils/colorPreview';
+import { getInventoryLayout } from '../../utils/inventoryLayout';
 
 export default function InventoryGrid() {
   const {
@@ -25,7 +26,7 @@ export default function InventoryGrid() {
   // Duplicate Modal State
   const [duplicateModal, setDuplicateModal] = useState({ isOpen: false, sourceSlot: null, targetSlot: '' });
 
-  const layout = { count: size || 27, gridCols: 'grid-cols-9' };
+  const layout = getInventoryLayout(inventory_type, size);
 
   // Close context menu on window click
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function InventoryGrid() {
     };
     window.addEventListener('click', handleClose);
     return () => window.removeEventListener('click', handleClose);
-  }, [contextMenu.show]);
+  }, [contextMenu]);
 
   // Context menu trigger
   const handleContextMenuOpen = (e, slotIndex) => {
@@ -145,20 +146,23 @@ export default function InventoryGrid() {
   return (
     <div className="relative flex flex-col items-center select-none animate-fadeIn">
       {/* Visual Chest Container (Minecraft UI Texture mimic) */}
-      <div className="bg-zinc-800 border-[4px] border-t-zinc-600 border-l-zinc-600 border-r-zinc-950 border-b-zinc-950 p-4 rounded shadow-2xl flex flex-col gap-3 min-w-[380px]">
+      <div className="inventory-shell bg-zinc-800 border-[4px] border-t-zinc-600 border-l-zinc-600 border-r-zinc-950 border-b-zinc-950 p-3 sm:p-4 rounded shadow-2xl flex flex-col gap-3 w-max max-w-full">
         {/* Chest GUI Header */}
         <div className="flex items-center justify-between border-b border-zinc-900 pb-2 px-1">
           <span className="text-xs font-bold tracking-wide font-sans text-zinc-300">
             <MinecraftText text={menu_title || 'Chest'} />
           </span>
           <span className="text-[10px] text-zinc-500 font-mono font-semibold uppercase tracking-wider scale-90 shrink-0">
-            {inventory_type} ({layout.count})
+            {layout.type} ({layout.count})
           </span>
         </div>
 
         {/* Chest Slots Grid */}
-        <div className="bg-zinc-950 p-1 rounded border border-zinc-950">
-          <div className={`grid ${layout.gridCols} gap-[2px]`}>
+        <div className="bg-zinc-950 p-1 rounded border border-zinc-950 overflow-x-auto">
+          <div
+            className="grid gap-[2px]"
+            style={{ gridTemplateColumns: `repeat(${layout.columns}, minmax(0, 1fr))` }}
+          >
             {cells}
           </div>
         </div>

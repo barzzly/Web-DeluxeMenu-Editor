@@ -97,21 +97,21 @@ export default function TopBar() {
   };
 
   return (
-    <div className="h-14 border-b border-zinc-800 bg-zinc-900 px-6 flex items-center justify-between select-none">
+    <div className="min-h-14 border-b border-zinc-800 bg-zinc-900 px-3 sm:px-6 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 select-none">
       {/* Left: Brand & Editable File Name */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6 min-w-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded bg-indigo-600 flex items-center justify-center font-bold text-white tracking-wider text-sm shadow shadow-indigo-500/20">
-            DM
+            Bz
           </div>
-          <span className="text-sm font-bold tracking-wide uppercase text-zinc-200 hidden sm:inline">Editor</span>
+          <span className="text-sm font-bold tracking-wide uppercase text-zinc-200 hidden sm:inline">Barzz.ly</span>
         </div>
 
         <div className="h-4 w-px bg-zinc-800 hidden sm:block" />
 
         {/* Editable Menu Name */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-zinc-500 font-mono">gui_menus/</span>
+          <span className="text-xs text-zinc-500 font-mono hidden sm:inline">dmenu.barzzly.com/</span>
           {isEditingName ? (
             <input
               type="text"
@@ -140,7 +140,7 @@ export default function TopBar() {
       </div>
 
       {/* Right: Actions and History */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
         {/* History controls */}
         <div className="flex items-center border border-zinc-800 rounded bg-zinc-950 p-0.5">
           <button

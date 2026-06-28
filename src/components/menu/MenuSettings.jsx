@@ -2,18 +2,22 @@ import React from 'react';
 import { useMenuStore } from '../../store/useMenuStore';
 import ColorCodeInput from '../ui/ColorCodeInput';
 import TagInput from '../ui/TagInput';
+import { CHEST_SIZES, INVENTORY_LAYOUTS, getInventoryLayout } from '../../utils/inventoryLayout';
 
 export default function MenuSettings() {
   const {
     menu_title,
     open_command,
     size,
+    inventory_type,
     update_interval,
     open_commands,
     open_requirement,
     setMenuField,
     setMenuSize
   } = useMenuStore();
+
+  const layout = getInventoryLayout(inventory_type, size);
 
   // Extraction of open requirement permission & deny commands
   const reqPermission = open_requirement?.requirements?.permission_check?.permission || '';
@@ -76,22 +80,39 @@ export default function MenuSettings() {
         <span className="text-[10px] text-zinc-500">Player command to open this menu (no slash).</span>
       </div>
 
-      {/* Size */}
-      <div className="flex flex-col gap-1.5">
-        <span className="font-semibold text-zinc-400 uppercase tracking-wide">Menu Size</span>
-        <select
-          value={size}
-          onChange={(e) => setMenuSize(parseInt(e.target.value, 10))}
-          className="w-full h-9 px-3 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all cursor-pointer"
-        >
-          <option value={9}>9 slots (1 row)</option>
-          <option value={18}>18 slots (2 rows)</option>
-          <option value={27}>27 slots (3 rows)</option>
-          <option value={36}>36 slots (4 rows)</option>
-          <option value={45}>45 slots (5 rows)</option>
-          <option value={54}>54 slots (6 rows)</option>
-        </select>
-        <span className="text-[10px] text-zinc-500">DeluxeMenus standard chest grid size.</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1.5">
+          <span className="font-semibold text-zinc-400 uppercase tracking-wide">Inventory Type</span>
+          <select
+            value={layout.type}
+            onChange={(e) => setMenuField('inventory_type', e.target.value)}
+            className="w-full h-9 px-3 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all cursor-pointer"
+          >
+            {Object.keys(INVENTORY_LAYOUTS).map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="font-semibold text-zinc-400 uppercase tracking-wide">Slots</span>
+          {layout.sizeEditable ? (
+            <select
+              value={layout.count}
+              onChange={(e) => setMenuSize(parseInt(e.target.value, 10))}
+              className="w-full h-9 px-3 rounded border border-zinc-800 bg-zinc-800 text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all cursor-pointer"
+            >
+              {CHEST_SIZES.map((slotCount) => (
+                <option key={slotCount} value={slotCount}>{slotCount} slots ({slotCount / 9} rows)</option>
+              ))}
+            </select>
+          ) : (
+            <div className="h-9 px-3 rounded border border-zinc-800 bg-zinc-900/60 text-zinc-400 flex items-center font-mono">
+              {layout.count} fixed
+            </div>
+          )}
+          <span className="text-[10px] text-zinc-500">Invalid chest sizes are rounded down, e.g. 37 becomes 36.</span>
+        </div>
       </div>
 
       {/* Update Interval */}

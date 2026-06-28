@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useMenuStore } from '../../store/useMenuStore';
 import { MinecraftText } from '../../utils/colorPreview';
 

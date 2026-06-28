@@ -13,7 +13,7 @@ export default function Sidebar() {
   const placedItems = Object.values(items).sort((a, b) => a.slot - b.slot);
 
   return (
-    <div className="w-[280px] border-r border-zinc-800 bg-zinc-900 flex flex-col h-full overflow-hidden select-none">
+    <div className="w-full lg:w-[280px] border-r border-zinc-800 bg-zinc-900 flex flex-col lg:h-full max-h-[45vh] lg:max-h-none overflow-hidden select-none">
       {/* Header Info */}
       <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900/40 flex items-center gap-2">
         <Settings size={14} className="text-zinc-400" />
@@ -56,7 +56,7 @@ export default function Sidebar() {
           </button>
           
           {itemListOpen && (
-            <div className="p-2 flex flex-col gap-1 max-h-[300px] overflow-y-auto">
+            <div className="p-2 flex flex-col gap-1 max-h-[180px] lg:max-h-[300px] overflow-y-auto">
               {placedItems.length === 0 ? (
                 <div className="text-[11px] text-zinc-500 text-center py-6">
                   No items placed yet. Click grid to add.
