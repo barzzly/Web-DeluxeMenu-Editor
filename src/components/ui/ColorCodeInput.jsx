@@ -1,11 +1,11 @@
 import React from 'react';
 import { MinecraftText } from '../../utils/colorPreview';
 
-export default function ColorCodeInput({ 
-  label, 
-  value = '', 
-  onChange, 
-  placeholder = '', 
+export default function ColorCodeInput({
+  label,
+  value = '',
+  onChange,
+  placeholder = '',
   isTextArea = false,
   rows = 3
 }) {

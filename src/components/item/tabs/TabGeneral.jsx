@@ -3,7 +3,7 @@ import { MATERIALS } from '../../../constants/materials';
 import ColorCodeInput from '../../ui/ColorCodeInput';
 import Toggle from '../../ui/Toggle';
 import TagInput from '../../ui/TagInput';
-import { Plus, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
+import { MinecraftText } from '../../../utils/colorPreview';
 
 export default function TabGeneral({ item, updateItem }) {
   const [customMaterial, setCustomMaterial] = useState(
@@ -45,36 +45,9 @@ export default function TabGeneral({ item, updateItem }) {
     m.toLowerCase().includes(matSearch.toLowerCase())
   ).slice(0, 100);
 
-  // Lore management
-  const handleAddLore = () => {
-    const currentLore = [...(item.lore || [])];
-    currentLore.push('');
-    updateItem(item.slot, { lore: currentLore });
-  };
-
-  const handleUpdateLore = (index, value) => {
-    const currentLore = [...(item.lore || [])];
-    currentLore[index] = value;
-    updateItem(item.slot, { lore: currentLore });
-  };
-
-  const handleRemoveLore = (index) => {
-    const currentLore = item.lore.filter((_, idx) => idx !== index);
-    updateItem(item.slot, { lore: currentLore });
-  };
-
-  const handleMoveLore = (index, direction) => {
-    const currentLore = [...(item.lore || [])];
-    if (direction === 'up' && index > 0) {
-      const temp = currentLore[index];
-      currentLore[index] = currentLore[index - 1];
-      currentLore[index - 1] = temp;
-    } else if (direction === 'down' && index < currentLore.length - 1) {
-      const temp = currentLore[index];
-      currentLore[index] = currentLore[index + 1];
-      currentLore[index + 1] = temp;
-    }
-    updateItem(item.slot, { lore: currentLore });
+  // Lore management: textarea, one line per lore entry
+  const handleLoreTextChange = (text) => {
+    updateItem(item.slot, { lore: text.split('\n') });
   };
 
   // Color Swatch parser for rgb (format: "R, G, B" or "R,G,B")
@@ -210,64 +183,23 @@ export default function TabGeneral({ item, updateItem }) {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between border-b border-zinc-800/40 pb-1">
           <span className="font-semibold text-zinc-400 uppercase tracking-wide">Lore Lines</span>
-          <button
-            type="button"
-            onClick={handleAddLore}
-            className="flex items-center gap-1 text-[10px] text-indigo-400 hover:text-indigo-300 font-medium"
-          >
-            <Plus size={12} />
-            <span>Add Line</span>
-          </button>
+          <span className="text-[10px] text-zinc-500">One line per row (Enter = new line)</span>
         </div>
 
-        {item.lore && item.lore.length > 0 ? (
-          <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+        <textarea
+          value={(item.lore || []).join('\n')}
+          onChange={(e) => handleLoreTextChange(e.target.value)}
+          placeholder={`e.g. &7A powerful weapon\n&eDamage: &c+10`}
+          rows={5}
+          className="w-full px-3 py-2 text-xs rounded border border-zinc-800 bg-zinc-800/50 text-zinc-200 placeholder:text-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 outline-none transition-all resize-y font-mono leading-relaxed"
+        />
+
+        {/* Live preview */}
+        {item.lore && item.lore.length > 0 && item.lore.some((l) => l !== '') && (
+          <div className="mt-1 px-3 py-2 rounded bg-zinc-950 border border-zinc-900 text-xs font-medium flex flex-col gap-0.5 leading-relaxed">
             {item.lore.map((line, idx) => (
-              <div key={idx} className="flex gap-2 items-start bg-zinc-900/40 p-2 rounded border border-zinc-800/30">
-                <div className="flex-1">
-                  <ColorCodeInput
-                    value={line}
-                    onChange={(val) => handleUpdateLore(idx, val)}
-                    placeholder={`Lore line ${idx + 1}`}
-                  />
-                </div>
-                {/* Actions */}
-                <div className="flex flex-col gap-1 shrink-0 mt-6">
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleMoveLore(idx, 'up')}
-                      disabled={idx === 0}
-                      className="p-1 rounded bg-zinc-850 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
-                      title="Move Up"
-                    >
-                      <ArrowUp size={11} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleMoveLore(idx, 'down')}
-                      disabled={idx === item.lore.length - 1}
-                      className="p-1 rounded bg-zinc-850 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
-                      title="Move Down"
-                    >
-                      <ArrowDown size={11} />
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveLore(idx)}
-                    className="p-1 rounded bg-zinc-850 hover:bg-red-950/40 hover:text-red-400 text-zinc-500 transition-colors"
-                    title="Remove Line"
-                  >
-                    <Trash2 size={11} />
-                  </button>
-                </div>
-              </div>
+              <MinecraftText key={idx} text={line} />
             ))}
-          </div>
-        ) : (
-          <div className="text-[10px] text-zinc-500 italic py-2">
-            No lore strings defined. Click "Add Line" to add one.
           </div>
         )}
       </div>
