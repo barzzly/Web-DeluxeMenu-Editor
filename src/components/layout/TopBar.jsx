@@ -35,7 +35,7 @@ export default function TopBar() {
     localStorage.setItem('barzzly-theme', theme);
   }, [theme]);
 
-  const logoSrc = '/images/barzzly-logo-dark.png';
+  const logoSrc = theme === 'dark' ? '/images/BarzzLy-putih-transparan.png' : '/images/BarzzLy-hitam-transparan.png';
   const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark');
 
   const handleSaveName = () => {
@@ -116,7 +116,7 @@ export default function TopBar() {
       {/* Left: Brand & Editable File Name */}
       <div className="flex items-center gap-3 sm:gap-6 min-w-0">
         <div className="flex items-center gap-2">
-          <img src={logoSrc} alt="BarzzLy logo" className={`h-8 w-8 object-contain shrink-0 opacity-95 ${theme === 'dark' ? 'invert' : ''}`} />
+          <img src={logoSrc} alt="BarzzLy logo" className="h-8 w-8 object-contain shrink-0 opacity-95" />
           <span className="text-sm font-bold tracking-wide uppercase text-zinc-100 sm:inline">BarzzLy</span>
         </div>
 
